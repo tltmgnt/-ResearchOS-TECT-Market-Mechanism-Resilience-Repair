@@ -1,0 +1,50 @@
+name: Market resilience research checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
+      - run: python cli.py examples/study.json --output /tmp/market-review-bundle.json
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --check web/app.js
+  cross-repository-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: "3.12"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: tltmgnt/Grok-HedgeOps-DTI
+          ref: 2e4a25e96e08f88ef92bd7fe92e1e2e60f1bad6d
+          path: integration/grok
+          persist-credentials: false
+      - name: Verify shared evaluator bytes and portable bundle round trip
+        run: |
+          cmp market_model.py integration/grok/market_resilience_model.py
+          python cli.py examples/study.json --output /tmp/contract-bundle.json
+          python integration/grok/market_resilience_review.py /tmp/contract-bundle.json --output /tmp/contract-review.json
+          python -c "import json; r=json.load(open('/tmp/contract-review.json')); assert r['status']=='human_review_required'; assert r['executionAuthorized'] is False; assert r['evidenceVerified'] is False"
