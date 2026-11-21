@@ -27,3 +27,7 @@ The adapter recomputes results, rejects tampering and creates an explicitly unve
 Model tests, HTTP smoke tests, and Python 3.10/3.12/3.13 CI check the CLI and browser server endpoints. JavaScript syntax is checked separately. Interactive browser behavior is not verified here; no executor is available in the originating conversation. Hosting remains unconfigured.
 
 Synthetic examples only. No live venue connection, attack execution, formal resilience proof, investment recommendation, government affiliation or empirical effectiveness claim. No live LLM provider is configured. Apache-2.0 license retained.
+
+## Terrain and market connectivity lab
+
+Start with the market lesson. Mask the central spread/depth observation and compare the 8 bp and 14 bp thresholds. In a repair review, document who supplied the cost assumptions and why each transition is plausible. [Standalone course and exercises](curriculum/terrain_market_resilience/README.md)
